@@ -88,6 +88,8 @@ class CarInterface(CarInterfaceBase):
       ret.transmissionType = TransmissionType.manual
       ret.minEnableSpeed = 20.0 * CV.MPH_TO_MS
 
+    # hard code automatic car
+    ret.transmissionType = TransmissionType.automatic
     # BSM: Side_Detect_L_Stat, Side_Detect_R_Stat
     # TODO: detect bsm in car_fw?
     ret.enableBsm = 0x3A6 in fingerprint[CAN.main] and 0x3A7 in fingerprint[CAN.main]
