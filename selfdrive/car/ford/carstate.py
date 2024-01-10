@@ -15,7 +15,7 @@ class CarState(CarStateBase):
     super().__init__(CP)
     can_define = CANDefine(DBC[CP.carFingerprint]["pt"])
     if CP.transmissionType == TransmissionType.automatic:
-      self.shifter_values = can_define.dv["Gear_Shift_by_Wire_FD1"]["TrnRng_D_RqGsm"]
+      self.shifter_values = can_define.dv["TransGearData"]["GearLvrPos_D_Actl"]
 
     self.vehicle_sensors_valid = False
     self.unsupported_platform = False
@@ -72,7 +72,7 @@ class CarState(CarStateBase):
 
     # gear
     if self.CP.transmissionType == TransmissionType.automatic:
-      gear = self.shifter_values.get(cp.vl["Gear_Shift_by_Wire_FD1"]["TrnRng_D_RqGsm"])
+      gear = self.shifter_values.get(cp.vl["TransGearData"]["GearLvrPos_D_Actl"])
       ret.gearShifter = self.parse_gear_shifter(gear)
     elif self.CP.transmissionType == TransmissionType.manual:
       ret.clutchPressed = cp.vl["Engine_Clutch_Data"]["CluPdlPos_Pc_Meas"] > 0
@@ -134,15 +134,15 @@ class CarState(CarStateBase):
         ("Lane_Assist_Data3_FD1", 33),
       ]
 
-    # if CP.transmissionType == TransmissionType.automatic:
-    #   messages += [
-    #     ("Gear_Shift_by_Wire_FD1", 10),
-    #   ]
-    # elif CP.transmissionType == TransmissionType.manual:
-    #   messages += [
-    #     ("Engine_Clutch_Data", 33),
-    #     ("BCM_Lamp_Stat_FD1", 1),
-    #   ]
+    if CP.transmissionType == TransmissionType.automatic:
+      messages += [
+        ("TransGearData", 10),
+      ]
+    elif CP.transmissionType == TransmissionType.manual:
+      messages += [
+        ("Engine_Clutch_Data", 33),
+        ("BCM_Lamp_Stat_FD1", 1),
+      ]
 
     if CP.enableBsm and CP.carFingerprint not in CANFD_CAR:
       messages += [
