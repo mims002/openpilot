@@ -134,15 +134,15 @@ class CarState(CarStateBase):
         ("Lane_Assist_Data3_FD1", 33),
       ]
 
-    if CP.transmissionType == TransmissionType.automatic:
-      messages += [
-        ("Gear_Shift_by_Wire_FD1", 10),
-      ]
-    elif CP.transmissionType == TransmissionType.manual:
-      messages += [
-        ("Engine_Clutch_Data", 33),
-        ("BCM_Lamp_Stat_FD1", 1),
-      ]
+    # if CP.transmissionType == TransmissionType.automatic:
+    #   messages += [
+    #     ("Gear_Shift_by_Wire_FD1", 10),
+    #   ]
+    # elif CP.transmissionType == TransmissionType.manual:
+    #   messages += [
+    #     ("Engine_Clutch_Data", 33),
+    #     ("BCM_Lamp_Stat_FD1", 1),
+    #   ]
 
     if CP.enableBsm and CP.carFingerprint not in CANFD_CAR:
       messages += [
