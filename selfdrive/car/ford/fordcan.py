@@ -34,7 +34,8 @@ def calculate_lat_ctl2_checksum(mode: int, counter: int, dat: bytearray) -> int:
   return 0xFF - (checksum & 0xFF)
 
 
-def create_lka_msg(packer, CAN: CanBus):
+def create_lka_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, path_angle: float, curvature: float,
+                       curvature_rate: float):
   """
   Creates an empty CAN message for the Ford LKA Command.
 
@@ -42,8 +43,21 @@ def create_lka_msg(packer, CAN: CanBus):
 
   Frequency is 33Hz.
   """
-
-  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, {})
+  LkaActvStats_D2_Req = 0
+  if lat_active:
+    LkaActvStats_D2_Req = 4 if curvature > 0 else 2
+    
+  values = {
+    'LkaDrvOvrrd_D_Rq': 0,
+    'LkaActvStats_D2_Req': LkaActvStats_D2_Req,
+    'LaRefAng_No_Req': path_angle,
+    'LaRampType_B_Req': 0,
+    'LaCurvature_No_Calc': curvature,
+    'LdwActvStats_D_Req': 0,
+    'LdwActvIntns_D_Req': 0,
+  }
+  
+  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
 
 
 def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, path_angle: float, curvature: float,
