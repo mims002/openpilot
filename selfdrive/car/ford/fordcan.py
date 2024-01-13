@@ -57,7 +57,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, pa
     'LdwActvIntns_D_Req': 0,
   }
   
-  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
+  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, {})
 
 
 def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, path_angle: float, curvature: float,
