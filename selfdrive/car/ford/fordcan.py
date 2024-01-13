@@ -44,21 +44,18 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, pa
   Frequency is 33Hz.
   """
   LkaActvStats_D2_Req = 0
-  if lat_active:
+  if lat_active and abs(curvature) > 0.0002:
     LkaActvStats_D2_Req = 4 if curvature > 0 else 2
     
   values = {
     'LkaDrvOvrrd_D_Rq': 0,
     'LkaActvStats_D2_Req': LkaActvStats_D2_Req,
-    'LaRefAng_No_Req': path_angle,
+    'LaRefAng_No_Req': 0,
     'LaRampType_B_Req': 0,
     'LaCurvature_No_Calc': curvature,
     'LdwActvStats_D_Req': 0,
     'LdwActvIntns_D_Req': 0,
   }
-  
-  if not lat_active:
-    return packer.make_can_msg("Lane_Assist_Data1", CAN.main, {})
   
   return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
 
