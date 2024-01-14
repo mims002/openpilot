@@ -38,7 +38,7 @@ def apply_ford_angle(apply_angle, apply_angle_last, v_ego_raw):
         apply_angle,
         apply_angle_last,
         v_ego_raw,
-        CarControllerParams
+        CarControllerParamsBronco
     )
     return apply_angle
 
