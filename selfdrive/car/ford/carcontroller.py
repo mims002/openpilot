@@ -4,6 +4,7 @@ from openpilot.common.conversions import Conversions as CV
 from opendbc.can.packer import CANPacker
 from openpilot.selfdrive.car import apply_std_steer_angle_limits
 from openpilot.selfdrive.car.ford import fordcan
+import math
 from openpilot.selfdrive.car.ford.values import CANFD_CAR, CarControllerParams
 
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -20,6 +21,11 @@ def apply_ford_curvature_limits(apply_curvature, apply_curvature_last, current_c
   apply_curvature = apply_std_steer_angle_limits(apply_curvature, apply_curvature_last, v_ego_raw, CarControllerParams)
 
   return clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
+
+
+def convert_ford_lka_angle(apply_angle, apply_angle_last):
+  millirad = math.radians(apply_angle) * 1000
+  return clip(millirad, -CarControllerParams.LKA_ANGLE_MAX, CarControllerParams.LKA_ANGLE_MAX)
 
 
 class CarController:
@@ -58,15 +64,17 @@ class CarController:
       can_sends.append(fordcan.create_button_msg(self.packer, self.CAN.camera, CS.buttons_stock_values, tja_toggle=True))
 
     ### lateral control ###
+    if CC.latActive:
+      # apply rate limits, curvature error limit, and clip to signal range
+      current_curvature = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
+      apply_curvature = apply_ford_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw)
+      path_angle = convert_ford_lka_angle(actuators.steerAngleDeg)
+    else:
+      apply_curvature = 0.
+      path_angle = 0.
+      
     # send steer msg at 20Hz
     if (self.frame % CarControllerParams.STEER_STEP) == 0:
-      if CC.latActive:
-        # apply rate limits, curvature error limit, and clip to signal range
-        current_curvature = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
-        apply_curvature = apply_ford_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw)
-      else:
-        apply_curvature = 0.
-
       self.apply_curvature_last = apply_curvature
 
       if self.CP.carFingerprint in CANFD_CAR:
@@ -75,18 +83,11 @@ class CarController:
         counter = (self.frame // CarControllerParams.STEER_STEP) % 0xF
         can_sends.append(fordcan.create_lat_ctl2_msg(self.packer, self.CAN, mode, 0., 0., -apply_curvature, 0., counter))
       else:
-        can_sends.append(fordcan.create_lat_ctl_msg(self.packer, self.CAN, CC.latActive, 0., 0., -apply_curvature, 0.))
-
-    if CC.latActive:
-      # apply rate limits, curvature error limit, and clip to signal range
-      current_curvature = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
-      apply_curvature = apply_ford_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw)
-    else:
-      apply_curvature = 0.
+        can_sends.append(fordcan.create_lat_ctl_msg(self.packer, self.CAN, CC.latActive, 0., path_angle, -apply_curvature, 0.))
       
     # send lka msg at 33Hz
     if (self.frame % CarControllerParams.LKA_STEP) == 0:
-      can_sends.append(fordcan.create_lka_msg(self.packer, self.CAN, CC.latActive, 0., 0., -apply_curvature, 0.))
+      can_sends.append(fordcan.create_lka_msg(self.packer, self.CAN, CC.latActive, path_angle, -apply_curvature))
 
     ### longitudinal control ###
     # send acc msg at 50Hz
