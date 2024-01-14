@@ -23,7 +23,7 @@ def apply_ford_curvature_limits(apply_curvature, apply_curvature_last, current_c
   return clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
 
 
-def convert_ford_lka_angle(apply_angle, apply_angle_last):
+def convert_ford_lka_angle(apply_angle):
   millirad = math.radians(apply_angle) * 1000
   return clip(millirad, -CarControllerParams.LKA_ANGLE_MAX, CarControllerParams.LKA_ANGLE_MAX)
 
