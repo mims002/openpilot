@@ -47,10 +47,10 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
   LkaActvStats_D2_Req = 0
   if lat_active:
     LkaActvStats_D2_Req = 4 if curvature > 0 else 2
-    
+
   millirad = math.radians(apply_angle) * 1000
   millirad = clip(millirad,-102.4, 102.3)
-    
+
   values = {
     'LkaDrvOvrrd_D_Rq': 0,
     'LkaActvStats_D2_Req': LkaActvStats_D2_Req,
@@ -60,12 +60,12 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
     'LdwActvStats_D_Req': 0,
     'LdwActvIntns_D_Req': 2,
   }
-  
+
   return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
 
 
 def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, apply_angle: float, curvature: float,
-                       curvature_rate: float):
+                       curvature_rate: float,test):
   """
   Creates a CAN message for the Ford TJA/LCA Command.
 
@@ -86,9 +86,9 @@ def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float
 
   Frequency is 20Hz.
   """
-  
+
   radian = math.radians(apply_angle)
-  radian = clip(millirad,-0.5, 0.5235)
+  radian = clip(radian,-0.5, 0.5235)
 
   values = {
     "LatCtlRng_L_Max": 0,                       # Unknown [0|126] meter
