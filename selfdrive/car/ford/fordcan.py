@@ -43,7 +43,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, path_angle: float, cur
   Frequency is 33Hz.
   """
   LkaActvStats_D2_Req = 0
-  if lat_active and abs(curvature) > 0.0002:
+  if lat_active:
     LkaActvStats_D2_Req = 4 if curvature > 0 else 2
   
     
