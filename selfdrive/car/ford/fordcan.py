@@ -65,7 +65,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
 
 
 def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, apply_angle: float, curvature: float,
-                       curvature_rate: float,test):
+                       curvature_rate: float):
   """
   Creates a CAN message for the Ford TJA/LCA Command.
 
