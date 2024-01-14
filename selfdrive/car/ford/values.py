@@ -21,7 +21,7 @@ class CarControllerParams:
   BUTTONS_STEP = 5      # Steering_Data_FD1, 10Hz, but send twice as fast
 
   CURVATURE_MAX = 0.02  # Max curvature for steering command, m^-1
-  LKA_ANGLE_MAX = 102.3     # Max steering angle in milliradians 
+  LKA_ANGLE_MAX = 102     # Max steering angle in milliradians 
   STEER_DRIVER_ALLOWANCE = 1.0  # Driver intervention threshold, Nm
 
   # Curvature rate limits
