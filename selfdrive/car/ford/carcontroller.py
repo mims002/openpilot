@@ -166,7 +166,7 @@ class CarController:
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             can_sends.append(
                 fordcan.create_lka_msg(
-                    self.packer, self.CAN, CC.latActive, -apply_angle, -apply_curvature
+                    self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature
                 )
             )
 
