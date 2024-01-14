@@ -23,9 +23,10 @@ def apply_ford_curvature_limits(apply_curvature, apply_curvature_last, current_c
   return clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
 
 
-def convert_ford_lka_angle(apply_angle):
-  millirad = math.radians(apply_angle) * 1000
-  return clip(millirad, -CarControllerParams.LKA_ANGLE_MAX, CarControllerParams.LKA_ANGLE_MAX)
+def apply_ford_angle(apply_angle, apply_angle_last, v_ego_raw):
+  apply_angle = apply_std_steer_angle_limits(apply_angle, apply_angle_last, v_ego_raw, CarControllerParams)
+  apply_angle = apply_std_steer_angle_limits(apply_angle, apply_angle, v_ego_raw, CarControllerParams)
+  return apply_angle
 
 
 class CarController:
@@ -37,6 +38,7 @@ class CarController:
     self.frame = 0
 
     self.apply_curvature_last = 0
+    self.apply_angle_last = 0
     self.main_on_last = False
     self.lkas_enabled_last = False
     self.steer_alert_last = False
@@ -68,14 +70,16 @@ class CarController:
       # apply rate limits, curvature error limit, and clip to signal range
       current_curvature = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
       apply_curvature = apply_ford_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw)
-      lka_path_angle = convert_ford_lka_angle(actuators.steeringAngleDeg)
+      apply_angle = apply_ford_angle(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw)
+      
+      self.apply_curvature_last = apply_curvature
+      self.apply_angle_last = apply_angle
     else:
       apply_curvature = 0.
-      lka_path_angle = 0.
-      
+      apply_angle = 0.
+    
     # send steer msg at 20Hz
     if (self.frame % CarControllerParams.STEER_STEP) == 0:
-      self.apply_curvature_last = apply_curvature
 
       if self.CP.carFingerprint in CANFD_CAR:
         # TODO: extended mode
@@ -87,7 +91,7 @@ class CarController:
       
     # send lka msg at 33Hz
     if (self.frame % CarControllerParams.LKA_STEP) == 0:
-      can_sends.append(fordcan.create_lka_msg(self.packer, self.CAN, CC.latActive, lka_path_angle, -apply_curvature))
+      can_sends.append(fordcan.create_lka_msg(self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature))
 
     ### longitudinal control ###
     # send acc msg at 50Hz

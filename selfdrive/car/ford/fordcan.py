@@ -1,3 +1,5 @@
+import math
+from openpilot.common.numpy_fast import clip
 from cereal import car
 from openpilot.selfdrive.car import CanBusBase
 
@@ -34,7 +36,7 @@ def calculate_lat_ctl2_checksum(mode: int, counter: int, dat: bytearray) -> int:
   return 0xFF - (checksum & 0xFF)
 
 
-def create_lka_msg(packer, CAN: CanBus, lat_active: bool, path_angle: float, curvature: float):
+def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, curvature: float):
   """
   Creates an empty CAN message for the Ford LKA Command.
 
@@ -45,12 +47,14 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, path_angle: float, cur
   LkaActvStats_D2_Req = 0
   if lat_active:
     LkaActvStats_D2_Req = 4 if curvature > 0 else 2
-  
+    
+  millirad = math.radians(apply_angle) * 1000
+  millirad = clip(millirad,-102.4, 102.3)
     
   values = {
     'LkaDrvOvrrd_D_Rq': 0,
     'LkaActvStats_D2_Req': LkaActvStats_D2_Req,
-    'LaRefAng_No_Req': path_angle,
+    'LaRefAng_No_Req': millirad,
     'LaRampType_B_Req': 0,
     'LaCurvature_No_Calc': curvature,
     'LdwActvStats_D_Req': 0,
@@ -60,7 +64,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, path_angle: float, cur
   return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
 
 
-def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, path_angle: float, curvature: float,
+def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, apply_angle: float, curvature: float,
                        curvature_rate: float):
   """
   Creates a CAN message for the Ford TJA/LCA Command.
@@ -82,6 +86,9 @@ def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float
 
   Frequency is 20Hz.
   """
+  
+  radian = math.radians(apply_angle)
+  radian = clip(millirad,-0.5, 0.5235)
 
   values = {
     "LatCtlRng_L_Max": 0,                       # Unknown [0|126] meter
@@ -93,11 +100,11 @@ def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float
     "LatCtlPrecision_D_Rq": 1,                  # Precision: 0=Comfortable, 1=Precise, 2/3=NotUsed [0|3]
                                                 #            The stock system always uses comfortable
     "LatCtlPathOffst_L_Actl": path_offset,      # Path offset [-5.12|5.11] meter
-    "LatCtlPath_An_Actl": path_angle,           # Path angle [-0.5|0.5235] radians
+    "LatCtlPath_An_Actl": radian,               # Path angle [-0.5|0.5235] radians
     "LatCtlCurv_NoRate_Actl": curvature_rate,   # Curvature rate [-0.001024|0.00102375] 1/meter^2
     "LatCtlCurv_No_Actl": curvature,            # Curvature [-0.02|0.02094] 1/meter
   }
-  return packer.make_can_msg("LateralMotionControl", CAN.main, {})
+  return packer.make_can_msg("LateralMotionControl", CAN.main, values)
 
 
 def create_lat_ctl2_msg(packer, CAN: CanBus, mode: int, path_offset: float, path_angle: float, curvature: float,
