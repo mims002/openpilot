@@ -68,7 +68,7 @@ class CarController:
       # apply rate limits, curvature error limit, and clip to signal range
       current_curvature = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
       apply_curvature = apply_ford_curvature_limits(actuators.curvature, self.apply_curvature_last, current_curvature, CS.out.vEgoRaw)
-      lka_path_angle = convert_ford_lka_angle(actuators.steerAngleDeg)
+      lka_path_angle = convert_ford_lka_angle(actuators.steeringAngleDeg)
     else:
       apply_curvature = 0.
       lka_path_angle = 0.
@@ -87,7 +87,7 @@ class CarController:
       
     # send lka msg at 33Hz
     if (self.frame % CarControllerParams.LKA_STEP) == 0:
-      can_sends.append(fordcan.create_lka_msg(self.packer, self.CAN, CC.latActive, lka_path_angle, -apply_curvature))
+      can_sends.append(fordcan.create_lka_msg(self.packer, self.CAN, CC.latActive, -lka_path_angle, -apply_curvature))
 
     ### longitudinal control ###
     # send acc msg at 50Hz
