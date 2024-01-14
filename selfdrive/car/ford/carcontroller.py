@@ -4,7 +4,7 @@ from openpilot.common.conversions import Conversions as CV
 from opendbc.can.packer import CANPacker
 from openpilot.selfdrive.car import apply_std_steer_angle_limits, AngleRateLimit
 from openpilot.selfdrive.car.ford import fordcan
-from openpilot.selfdrive.car.ford.values import CANFD_CAR, CarControllerParams
+from openpilot.selfdrive.car.ford.values import CANFD_CAR, CarControllerParams, CarControllerParamsBronco
 
 LongCtrlState = car.CarControl.Actuators.LongControlState
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -38,14 +38,7 @@ def apply_ford_angle(apply_angle, apply_angle_last, v_ego_raw):
         apply_angle,
         apply_angle_last,
         v_ego_raw,
-        {
-            'ANGLE_RATE_LIMIT_UP': AngleRateLimit(
-                speed_bp=[5, 25], angle_v=[0.5, 0.05]
-            ),
-            'ANGLE_RATE_LIMIT_DOWN': AngleRateLimit(
-                speed_bp=[5, 25], angle_v=[0.5, 0.05]
-            ),
-        },
+        CarControllerParamsBronco
     )
     return apply_angle
 

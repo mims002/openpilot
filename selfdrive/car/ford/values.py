@@ -11,7 +11,33 @@ from openpilot.selfdrive.car.fw_query_definitions import FwQueryConfig, Request,
 
 Ecu = car.CarParams.Ecu
 
+class CarControllerParamsBronco:
+  STEER_STEP = 5        # LateralMotionControl, 20Hz
+  LKA_STEP = 3          # Lane_Assist_Data1, 33Hz
+  ACC_CONTROL_STEP = 2  # ACCDATA, 50Hz
+  LKAS_UI_STEP = 100    # IPMA_Data, 1Hz
+  ACC_UI_STEP = 20      # ACCDATA_3, 5Hz
+  BUTTONS_STEP = 5      # Steering_Data_FD1, 10Hz, but send twice as fast
 
+  CURVATURE_MAX = 0.02  # Max curvature for steering command, m^-1
+  STEER_DRIVER_ALLOWANCE = 1.0  # Driver intervention threshold, Nm
+
+  # Curvature rate limits
+  # The curvature signal is limited to 0.003 to 0.009 m^-1/sec by the EPS depending on speed and direction
+  # Limit to ~2 m/s^3 up, ~3 m/s^3 down at 75 mph
+  # Worst case, the low speed limits will allow 4.3 m/s^3 up, 4.9 m/s^3 down at 75 mph
+  ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.5, 0.05])
+  ANGLE_RATE_LIMIT_DOWN = AngleRateLimit(speed_bp=[5, 25], angle_v=[0.5, 0.05])
+  CURVATURE_ERROR = 0.002  # ~6 degrees at 10 m/s, ~10 degrees at 35 m/s
+
+  ACCEL_MAX = 2.0               # m/s^2 max acceleration
+  ACCEL_MIN = -3.5              # m/s^2 max deceleration
+  MIN_GAS = -0.5
+  INACTIVE_GAS = -5.0
+
+  def __init__(self, CP):
+    pass
+  
 class CarControllerParams:
   STEER_STEP = 5        # LateralMotionControl, 20Hz
   LKA_STEP = 3          # Lane_Assist_Data1, 33Hz
