@@ -48,7 +48,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
   if lat_active:
     LkaActvStats_D2_Req = 4 if curvature > 0 else 2
 
-  millirad = math.radians(apply_angle) * 1000
+  millirad = math.radians(apply_angle) * 100
   millirad = clip(millirad,-102.4, 102.3)
 
   values = {
