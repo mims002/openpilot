@@ -157,7 +157,7 @@ class CarController:
                         self.CAN,
                         CC.latActive,
                         0.0,
-                        0.0,
+                        apply_angle,
                         -apply_curvature,
                         0.0,
                     )

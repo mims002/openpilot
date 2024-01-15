@@ -61,7 +61,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
     'LdwActvIntns_D_Req': 2,
   }
 
-  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
+  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, {})
 
 
 def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float, apply_angle: float, curvature: float,
@@ -88,7 +88,7 @@ def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float
   """
 
   radian = math.radians(apply_angle)
-  radian = clip(radian,-0.5, 0.5235)
+  radian = clip(radian,-0.5, 0.5235) / 10.0
 
   values = {
     "LatCtlRng_L_Max": 0,                       # Unknown [0|126] meter
@@ -104,7 +104,7 @@ def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, path_offset: float
     "LatCtlCurv_NoRate_Actl": curvature_rate,   # Curvature rate [-0.001024|0.00102375] 1/meter^2
     "LatCtlCurv_No_Actl": curvature,            # Curvature [-0.02|0.02094] 1/meter
   }
-  return packer.make_can_msg("LateralMotionControl", CAN.main, {})
+  return packer.make_can_msg("LateralMotionControl", CAN.main, values)
 
 
 def create_lat_ctl2_msg(packer, CAN: CanBus, mode: int, path_offset: float, path_angle: float, curvature: float,
