@@ -4,7 +4,11 @@ from openpilot.common.conversions import Conversions as CV
 from opendbc.can.packer import CANPacker
 from openpilot.selfdrive.car import apply_std_steer_angle_limits, AngleRateLimit
 from openpilot.selfdrive.car.ford import fordcan
-from openpilot.selfdrive.car.ford.values import CANFD_CAR, CarControllerParams, CarControllerParamsBronco
+from openpilot.selfdrive.car.ford.values import (
+    CANFD_CAR,
+    CarControllerParams,
+    CarControllerParamsBronco,
+)
 
 LongCtrlState = car.CarControl.Actuators.LongControlState
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -36,10 +40,7 @@ def apply_ford_curvature_limits(
 def apply_ford_angle(apply_angle, apply_angle_last, v_ego_raw):
     apply_angle = apply_angle - apply_angle_last
     apply_angle = apply_std_steer_angle_limits(
-        apply_angle,
-        apply_angle_last,
-        v_ego_raw,
-        CarControllerParamsBronco
+        apply_angle, apply_angle_last, v_ego_raw, CarControllerParamsBronco
     )
     return apply_angle
 
@@ -156,10 +157,7 @@ class CarController:
                         self.packer,
                         self.CAN,
                         CC.latActive,
-                        0.0,
-                        apply_angle,
-                        -apply_curvature,
-                        0.0,
+                        CS.lateral_motion_control,
                     )
                 )
 
@@ -240,6 +238,7 @@ class CarController:
 
         new_actuators = actuators.copy()
         new_actuators.curvature = self.apply_curvature_last
+        new_actuators.steeringAngleDeg = self.apply_angle_last
 
         self.frame += 1
         return new_actuators, can_sends
