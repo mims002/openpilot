@@ -163,6 +163,8 @@ class CarState(CarStateBase):
       ("ACCDATA_2", 50),
       ("ACCDATA_3", 5),
       ("IPMA_Data", 1),
+      ("LateralMotionControl", 1),
+      
     ]
 
     if CP.enableBsm and CP.carFingerprint in CANFD_CAR:
