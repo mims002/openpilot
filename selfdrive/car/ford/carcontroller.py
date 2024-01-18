@@ -12,9 +12,6 @@ from openpilot.selfdrive.car.ford.values import (
 
 LongCtrlState = car.CarControl.Actuators.LongControlState
 VisualAlert = car.CarControl.HUDControl.VisualAlert
-last_direction = 0
-last_direction_count = 0
-reset_count = 0
 
 def apply_ford_curvature_limits(
     apply_curvature, apply_curvature_last, current_curvature, v_ego_raw
@@ -48,6 +45,10 @@ def apply_ford_angle(apply_angle, apply_angle_last, v_ego_raw):
 
 
 class CarController:
+    last_direction = 0
+    last_direction_count = 0
+    reset_count = 0
+
     def __init__(self, dbc_name, CP, VM):
         self.CP = CP
         self.VM = VM
