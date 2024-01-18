@@ -36,10 +36,10 @@ def apply_ford_curvature_limits(
     )
 
 
-def apply_ford_angle(apply_angle, apply_angle_last, v_ego_raw):
-    # apply_angle = apply_angle - apply_angle_last
+def apply_ford_angle(desired_angle, current_angle, v_ego_raw):
+    apply_angle = desired_angle - current_angle
     apply_angle = apply_std_steer_angle_limits(
-        apply_angle, apply_angle_last, v_ego_raw, CarControllerParamsBronco
+        apply_angle, current_angle, v_ego_raw, CarControllerParamsBronco
     )
     return apply_angle
 
@@ -127,7 +127,7 @@ class CarController:
                 CS.out.vEgoRaw,
             )
             apply_angle = apply_ford_angle(
-                actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw
+                actuators.steeringAngleDeg, CS.out.steeringAngleDeg, CS.out.vEgoRaw
             )
 
             self.apply_curvature_last = apply_curvature
@@ -259,7 +259,7 @@ class CarController:
 
         new_actuators = actuators.copy()
         new_actuators.curvature = self.apply_curvature_last
-        new_actuators.steeringAngleDeg = self.apply_angle_last
+        new_actuators.steeringAngleDeg = apply_angle + CS.out.steeringAngleDeg
 
         self.frame += 1
         return new_actuators, can_sends
