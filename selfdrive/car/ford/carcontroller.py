@@ -177,7 +177,7 @@ class CarController:
             if new_direction == 0: 
                 CarController.reset_count += 1
             
-            if CarController.reset_count >= 5 :
+            if CarController.reset_count >= 1 :
                 CarController.last_direction_count = 0
                 CarController.reset_count = 0
             else:
