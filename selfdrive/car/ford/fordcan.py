@@ -36,7 +36,7 @@ def calculate_lat_ctl2_checksum(mode: int, counter: int, dat: bytearray) -> int:
   return 0xFF - (checksum & 0xFF)
 
 
-def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, curvature: float):
+def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, curvature: float, direction: int):
   """
   Creates an empty CAN message for the Ford LKA Command.
 
@@ -44,16 +44,14 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
 
   Frequency is 33Hz.
   """
-  LkaActvStats_D2_Req = 0
-  if lat_active:
-    LkaActvStats_D2_Req = 4 if curvature > 0 else 2
 
   millirad = math.radians(apply_angle) * 100
   millirad = clip(millirad,-102.4, 102.3)
 
+
   values = {
     'LkaDrvOvrrd_D_Rq': 0,
-    'LkaActvStats_D2_Req': LkaActvStats_D2_Req,
+    'LkaActvStats_D2_Req': direction,
     'LaRefAng_No_Req': millirad,
     'LaRampType_B_Req': 0,
     'LaCurvature_No_Calc': curvature,
@@ -61,7 +59,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
     'LdwActvIntns_D_Req': 2,
   }
 
-  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, {})
+  return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
 
 
 def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, lateral_motion_control):

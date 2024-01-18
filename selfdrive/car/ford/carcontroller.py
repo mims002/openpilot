@@ -58,6 +58,8 @@ class CarController:
         self.main_on_last = False
         self.lkas_enabled_last = False
         self.steer_alert_last = False
+        self.last_direction = 0
+        self.last_direction_count = 0
 
     def update(self, CC, CS, now_nanos):
         can_sends = []
@@ -163,11 +165,25 @@ class CarController:
 
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
-            can_sends.append(
-                fordcan.create_lka_msg(
-                    self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature
-                )
+            if CC.latActive:
+                new_direction = 4 if -apply_curvature > 0 else 2
+            else:
+                new_direction = 0
+            
+            if new_direction != self.last_direction or self.last_direction_count > 10:
+                new_direction: 0
+                
+            if new_direction == 0:
+                self.last_direction_count = 0
+            else:
+                self.last_direction_count = self.last_direction_count + 1
+                
+            message = fordcan.create_lka_msg(
+                self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature, new_direction
             )
+            
+            can_sends.append(message)
+            self.last_direction = new_direction
 
         ### longitudinal control ###
         # send acc msg at 50Hz
