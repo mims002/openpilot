@@ -60,6 +60,7 @@ class CarController:
         self.steer_alert_last = False
         self.last_direction = 0
         self.last_direction_count = 0
+        self.reset_count = 0
 
     def update(self, CC, CS, now_nanos):
         can_sends = []
@@ -170,11 +171,16 @@ class CarController:
             else:
                 new_direction = 0
             
-            if new_direction != self.last_direction or self.last_direction_count > 10:
+            if new_direction != self.last_direction or self.last_direction_count > 20:
                 new_direction: 0
                 
-            if new_direction == 0:
+                
+            if new_direction == 0: 
+                self.reset_count = self.reset_count + 1
+            
+            if self.reset_count >= 5 :
                 self.last_direction_count = 0
+                self.reset_count = 0
             else:
                 self.last_direction_count = self.last_direction_count + 1
                 
