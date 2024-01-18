@@ -171,14 +171,14 @@ class CarController:
             else:
                 new_direction = 0
             
-            if new_direction != self.last_direction or self.last_direction_count > 20:
+            if new_direction != self.last_direction or self.last_direction_count > 30:
                 new_direction: 0
                 
                 
             if new_direction == 0: 
                 self.reset_count = self.reset_count + 1
             
-            if self.reset_count >= 5 :
+            if self.reset_count >= 10 :
                 self.last_direction_count = 0
                 self.reset_count = 0
             else:
