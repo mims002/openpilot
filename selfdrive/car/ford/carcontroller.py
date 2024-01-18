@@ -171,7 +171,7 @@ class CarController:
             else:
                 new_direction = 0
             
-            if new_direction != self.last_direction or self.last_direction_count > 30:
+            if new_direction != self.last_direction or self.last_direction_count > 10:
                 new_direction: 0
                 
                 
