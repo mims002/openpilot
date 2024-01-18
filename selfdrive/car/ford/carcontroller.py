@@ -171,18 +171,17 @@ class CarController:
             else:
                 new_direction = 0
             
-            if new_direction != self.last_direction or self.last_direction_count > 10:
+            if self.last_direction_count > 10:
                 new_direction: 0
                 
-                
             if new_direction == 0: 
-                self.reset_count = self.reset_count + 1
+                self.reset_count += 1
             
             if self.reset_count >= 10 :
                 self.last_direction_count = 0
                 self.reset_count = 0
             else:
-                self.last_direction_count = self.last_direction_count + 1
+                self.last_direction_count += 1
                 
             message = fordcan.create_lka_msg(
                 self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature, new_direction
