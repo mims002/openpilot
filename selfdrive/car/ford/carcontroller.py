@@ -177,11 +177,11 @@ class CarController:
             if new_direction == 0: 
                 CarController.reset_count += 1
             
-            if CarController.reset_count >= 10 :
-                CarController.last_direction_count = 0
-                CarController.reset_count = 0
-            else:
-                CarController.last_direction_count += 1
+            # if CarController.reset_count >= 10 :
+            #     CarController.last_direction_count = 0
+            #     CarController.reset_count = 0
+            # else:
+            CarController.last_direction_count += 1
                 
             message = fordcan.create_lka_msg(
                 self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature, new_direction
