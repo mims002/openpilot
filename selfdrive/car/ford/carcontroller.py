@@ -37,7 +37,7 @@ def apply_ford_curvature_limits(
 
 
 def apply_ford_angle(apply_angle, apply_angle_last, v_ego_raw):
-    apply_angle = apply_angle - apply_angle_last
+    # apply_angle = apply_angle - apply_angle_last
     apply_angle = apply_std_steer_angle_limits(
         apply_angle, apply_angle_last, v_ego_raw, CarControllerParamsBronco
     )
