@@ -12,7 +12,9 @@ from openpilot.selfdrive.car.ford.values import (
 
 LongCtrlState = car.CarControl.Actuators.LongControlState
 VisualAlert = car.CarControl.HUDControl.VisualAlert
-
+last_direction = 0
+last_direction_count = 0
+reset_count = 0
 
 def apply_ford_curvature_limits(
     apply_curvature, apply_curvature_last, current_curvature, v_ego_raw
@@ -58,9 +60,6 @@ class CarController:
         self.main_on_last = False
         self.lkas_enabled_last = False
         self.steer_alert_last = False
-        self.last_direction = 0
-        self.last_direction_count = 0
-        self.reset_count = 0
 
     def update(self, CC, CS, now_nanos):
         can_sends = []
@@ -171,24 +170,24 @@ class CarController:
             else:
                 new_direction = 0
             
-            if self.last_direction_count > 10:
+            if last_direction_count > 10:
                 new_direction: 0
                 
             if new_direction == 0: 
-                self.reset_count += 1
+                reset_count += 1
             
-            if self.reset_count >= 10 :
-                self.last_direction_count = 0
-                self.reset_count = 0
+            if reset_count >= 10 :
+                last_direction_count = 0
+                reset_count = 0
             else:
-                self.last_direction_count += 1
+                last_direction_count += 1
                 
             message = fordcan.create_lka_msg(
                 self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature, new_direction
             )
             
             can_sends.append(message)
-            self.last_direction = new_direction
+            last_direction = new_direction
 
         ### longitudinal control ###
         # send acc msg at 50Hz
