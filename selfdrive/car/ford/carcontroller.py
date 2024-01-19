@@ -42,7 +42,7 @@ def apply_ford_angle(desired_angle, last_angle, CS):
         desired_angle, last_angle, CS.out.vEgoRaw, CarControllerParamsBronco
     )
     apply_angle = clip(
-        apply_angle, CS.out.steeringAngleDeg - 10, CS.out.steeringAngleDeg + 10
+        apply_angle, CS.out.steeringAngleDeg - 30, CS.out.steeringAngleDeg + 30
     )
     return apply_angle
 
