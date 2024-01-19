@@ -134,7 +134,6 @@ class CarController:
             )
 
             self.apply_curvature_last = apply_curvature
-            self.apply_angle_last = apply_angle
         else:
             apply_curvature = 0.0
             apply_angle = CS.out.steeringAngleDeg
@@ -170,7 +169,7 @@ class CarController:
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             if CC.latActive and CS.lkas_available:
-                new_direction = 2 if apply_angle > 0 else 4
+                new_direction = 4 if self.apply_angle_last > apply_angle else 2
             else:
                 new_direction = 0
 
@@ -273,7 +272,8 @@ class CarController:
         self.main_on_last = main_on
         self.lkas_enabled_last = CC.latActive
         self.steer_alert_last = steer_alert
-
+        self.apply_angle_last = apply_angle
+        
         new_actuators = actuators.copy()
         new_actuators.curvature = self.apply_curvature_last
         new_actuators.steeringAngleDeg = self.apply_angle_last
