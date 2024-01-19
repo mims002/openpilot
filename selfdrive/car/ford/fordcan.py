@@ -53,7 +53,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
     'LkaDrvOvrrd_D_Rq': 0,
     'LkaActvStats_D2_Req': direction,
     'LaRefAng_No_Req': millirad,
-    'LaRampType_B_Req': ramp_type,
+    'LaRampType_B_Req': 0,
     'LaCurvature_No_Calc': curvature,
     'LdwActvStats_D_Req': 0,
     'LdwActvIntns_D_Req': 2,
