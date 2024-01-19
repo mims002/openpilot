@@ -13,6 +13,7 @@ from openpilot.selfdrive.car.ford.values import (
 LongCtrlState = car.CarControl.Actuators.LongControlState
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
+
 def apply_ford_curvature_limits(
     apply_curvature, apply_curvature_last, current_curvature, v_ego_raw
 ):
@@ -36,10 +37,12 @@ def apply_ford_curvature_limits(
     )
 
 
-def apply_ford_angle(desired_angle, current_angle, v_ego_raw):
-    apply_angle = desired_angle - current_angle
+def apply_ford_angle(desired_angle, last_angle, CS):
     apply_angle = apply_std_steer_angle_limits(
-        apply_angle, current_angle, v_ego_raw, CarControllerParamsBronco
+        desired_angle, last_angle, CS.out.vEgoRaw, CarControllerParamsBronco
+    )
+    apply_angle = clip(
+        apply_angle, CS.out.steeringAngleDeg - 10, CS.out.steeringAngleDeg + 10
     )
     return apply_angle
 
@@ -127,14 +130,14 @@ class CarController:
                 CS.out.vEgoRaw,
             )
             apply_angle = apply_ford_angle(
-                actuators.steeringAngleDeg, CS.out.steeringAngleDeg, CS.out.vEgoRaw
+                actuators.steeringAngleDeg, self.apply_angle_last, CS
             )
 
             self.apply_curvature_last = apply_curvature
             self.apply_angle_last = apply_angle
         else:
             apply_curvature = 0.0
-            apply_angle = 0.0
+            apply_angle = CS.out.steeringAngleDeg
 
         # send steer msg at 20Hz
         if (self.frame % CarControllerParams.STEER_STEP) == 0:
@@ -167,26 +170,34 @@ class CarController:
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             if CC.latActive:
-                new_direction = 4 if actuators.steeringAngleDeg > 0 else 2
+                new_direction = 4 if apply_angle > 0 else 2
             else:
                 new_direction = 0
-            
-            if (CarController.last_direction_count != 0 and CarController.last_direction != new_direction) or CarController.last_direction_count > 40:
+
+            if (
+                CarController.last_direction_count != 0
+                and CarController.last_direction != new_direction
+            ) or CarController.last_direction_count > 40:
                 new_direction = 0
-                
-            if new_direction == 0: 
+
+            if new_direction == 0:
                 CarController.reset_count += 1
-            
-            if CarController.reset_count >= 2 :
+
+            if CarController.reset_count >= 1:
                 CarController.last_direction_count = 0
                 CarController.reset_count = 0
             else:
                 CarController.last_direction_count += 1
-                
+
             message = fordcan.create_lka_msg(
-                self.packer, self.CAN, CC.latActive, apply_angle, -apply_curvature, new_direction
+                self.packer,
+                self.CAN,
+                CC.latActive,
+                apply_angle,
+                -apply_curvature,
+                new_direction,
             )
-            
+
             can_sends.append(message)
             CarController.last_direction = new_direction
 
@@ -259,7 +270,6 @@ class CarController:
 
         new_actuators = actuators.copy()
         new_actuators.curvature = self.apply_curvature_last
-        new_actuators.steeringAngleDeg = apply_angle + CS.out.steeringAngleDeg
-
+        new_actuators.steeringAngleDeg = self.apply_angle_last
         self.frame += 1
         return new_actuators, can_sends
