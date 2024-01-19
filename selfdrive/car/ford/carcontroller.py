@@ -42,7 +42,7 @@ def apply_ford_angle(desired_angle, last_angle, CS):
         desired_angle, last_angle, CS.out.vEgoRaw, CarControllerParamsBronco
     )
     apply_angle = clip(
-        apply_angle, CS.out.steeringAngleDeg - 40, CS.out.steeringAngleDeg + 40
+        apply_angle, CS.out.steeringAngleDeg - 30, CS.out.steeringAngleDeg + 30
     )
     return apply_angle
 
@@ -183,7 +183,7 @@ class CarController:
             if new_direction == 0:
                 CarController.reset_count += 1
 
-            if CarController.reset_count >= 1:
+            if CarController.reset_count >= 3:
                 CarController.last_direction_count = 0
                 CarController.reset_count = 0
             else:
