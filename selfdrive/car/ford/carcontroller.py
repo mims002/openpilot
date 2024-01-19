@@ -42,7 +42,7 @@ def apply_ford_angle(desired_angle, last_angle, CS):
         desired_angle, last_angle, CS.out.vEgoRaw, CarControllerParamsBronco
     )
     apply_angle = clip(
-        apply_angle, CS.out.steeringAngleDeg - 30, CS.out.steeringAngleDeg + 30
+        apply_angle, CS.out.steeringAngleDeg - 40, CS.out.steeringAngleDeg + 40
     )
     return apply_angle
 
@@ -188,6 +188,11 @@ class CarController:
                 CarController.reset_count = 0
             else:
                 CarController.last_direction_count += 1
+            
+            if CarController.last_direction_count <= 5:
+                ramp_type = 1
+            else:
+                ramp_type = 0
 
             message = fordcan.create_lka_msg(
                 self.packer,
@@ -196,6 +201,7 @@ class CarController:
                 apply_angle,
                 -apply_curvature,
                 new_direction,
+                ramp_type
             )
 
             can_sends.append(message)

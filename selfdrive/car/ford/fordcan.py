@@ -36,7 +36,7 @@ def calculate_lat_ctl2_checksum(mode: int, counter: int, dat: bytearray) -> int:
   return 0xFF - (checksum & 0xFF)
 
 
-def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, curvature: float, direction: int):
+def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, curvature: float, direction: int, ramp_type: int):
   """
   Creates an empty CAN message for the Ford LKA Command.
 
@@ -53,7 +53,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
     'LkaDrvOvrrd_D_Rq': 0,
     'LkaActvStats_D2_Req': direction,
     'LaRefAng_No_Req': millirad,
-    'LaRampType_B_Req': 1,
+    'LaRampType_B_Req': ramp_type,
     'LaCurvature_No_Calc': curvature,
     'LdwActvStats_D_Req': 0,
     'LdwActvIntns_D_Req': 2,
