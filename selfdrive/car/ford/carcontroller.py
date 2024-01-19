@@ -177,7 +177,7 @@ class CarController:
             if (
                 CarController.last_direction_count != 0
                 and CarController.last_direction != new_direction
-            ) or CarController.last_direction_count > 40:
+            ) or CarController.last_direction_count > 30:
                 new_direction = 0
 
             if new_direction == 0:
