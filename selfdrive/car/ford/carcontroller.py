@@ -120,7 +120,7 @@ class CarController:
             )
 
         ### lateral control ###
-        if CC.latActive:
+        if CC.latActive and CS.lkas_available:
             # apply rate limits, curvature error limit, and clip to signal range
             current_curvature = -CS.out.yawRate / max(CS.out.vEgoRaw, 0.1)
             apply_curvature = apply_ford_curvature_limits(
@@ -141,7 +141,7 @@ class CarController:
 
         # send steer msg at 20Hz
         if (self.frame % CarControllerParams.STEER_STEP) == 0:
-            if self.CP.carFingerprint in CANFD_CAR:
+            if True or self.CP.carFingerprint in CANFD_CAR:
                 # TODO: extended mode
                 mode = 1 if CC.latActive else 0
                 counter = (self.frame // CarControllerParams.STEER_STEP) % 0xF
@@ -169,7 +169,7 @@ class CarController:
 
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
-            if CC.latActive:
+            if CC.latActive and CS.lkas_available:
                 new_direction = 2 if apply_angle > 0 else 4
             else:
                 new_direction = 0
@@ -197,7 +197,7 @@ class CarController:
             message = fordcan.create_lka_msg(
                 self.packer,
                 self.CAN,
-                CC.latActive,
+                CC.latActive and CS.lkas_available,
                 apply_angle,
                 -apply_curvature,
                 new_direction,

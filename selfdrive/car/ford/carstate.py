@@ -59,6 +59,8 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint in CANFD_CAR:
       # this signal is always 0 on non-CAN FD cars
       ret.steerFaultTemporary |= cp.vl["Lane_Assist_Data3_FD1"]["LatCtlSte_D_Stat"] not in (1, 2, 3)
+      
+    self.lkas_available = cp.vl["Lane_Assist_Data3_FD1"]["LaActAvail_D_Actl"] == 3
 
     # cruise state
     ret.cruiseState.speed = cp.vl["EngBrakeData"]["Veh_V_DsplyCcSet"] * CV.MPH_TO_MS
@@ -132,7 +134,7 @@ class CarState(CarStateBase):
       ("RCMStatusMessage2_FD1", 10),
     ]
 
-    if CP.carFingerprint in CANFD_CAR:
+    if True or CP.carFingerprint in CANFD_CAR:
       messages += [
         ("Lane_Assist_Data3_FD1", 33),
       ]
