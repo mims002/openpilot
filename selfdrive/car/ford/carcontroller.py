@@ -167,17 +167,17 @@ class CarController:
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             if CC.latActive:
-                new_direction = 4 if -apply_curvature > 0 else 2
+                new_direction = 4 if actuators.steeringAngleDeg > 0 else 2
             else:
                 new_direction = 0
             
-            if (CarController.last_direction_count != 0 and CarController.last_direction != new_direction) or CarController.last_direction_count > 50:
+            if (CarController.last_direction_count != 0 and CarController.last_direction != new_direction) or CarController.last_direction_count > 40:
                 new_direction = 0
                 
             if new_direction == 0: 
                 CarController.reset_count += 1
             
-            if CarController.reset_count >= 1 :
+            if CarController.reset_count >= 2 :
                 CarController.last_direction_count = 0
                 CarController.reset_count = 0
             else:
