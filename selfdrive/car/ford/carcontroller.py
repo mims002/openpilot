@@ -170,7 +170,7 @@ class CarController:
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             if CC.latActive:
-                new_direction = 4 if apply_angle > 0 else 2
+                new_direction = 4 if -apply_curvature > 0 else 2
             else:
                 new_direction = 0
 
