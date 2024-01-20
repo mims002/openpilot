@@ -43,16 +43,12 @@ def apply_ford_angle(desired_angle, CS):
     # )
     
     normalized_angle = desired_angle - CS.out.steeringAngleDeg
-    clipped_angle = clip(normalized_angle, -5, 5)
+    clipped_angle = clip(normalized_angle, -5.8, 5.8)
     
     return clipped_angle
 
 
 class CarController:
-    last_direction = 0
-    last_direction_count = 0
-    reset_count = 0
-
     def __init__(self, dbc_name, CP, VM):
         self.CP = CP
         self.VM = VM
@@ -173,23 +169,8 @@ class CarController:
                 new_direction = 2 if CS.out.steeringAngleDeg > 0 else 4
             else:
                 new_direction = 0
-
-            if (
-                CarController.last_direction_count != 0
-                and CarController.last_direction != new_direction
-            ) or CarController.last_direction_count > 50:
-                new_direction = 0
-
-            if new_direction == 0:
-                CarController.reset_count += 1
-
-            if CarController.reset_count >= 1:
-                CarController.last_direction_count = 0
-                CarController.reset_count = 0
-            else:
-                CarController.last_direction_count += 1
             
-            if CarController.last_direction_count <= 5:
+            if  abs(apply_angle) >= 5 :
                 ramp_type = 1
             else:
                 ramp_type = 0
@@ -205,7 +186,6 @@ class CarController:
             )
 
             can_sends.append(message)
-            CarController.last_direction = new_direction
 
         ### longitudinal control ###
         # send acc msg at 50Hz
