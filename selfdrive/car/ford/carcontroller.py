@@ -38,9 +38,10 @@ def apply_ford_curvature_limits(
 
 
 def apply_ford_angle(desired_angle, CS):
-    desired_angle = apply_std_steer_angle_limits(
-        desired_angle, CS.out.steeringAngleDeg, CS.out.vEgoRaw, CarControllerParamsBronco
-    )
+    # desired_angle = apply_std_steer_angle_limits(
+    #     desired_angle, CS.out.steeringAngleDeg, CS.out.vEgoRaw, CarControllerParamsBronco
+    # )
+    
     normalized_angle = desired_angle - CS.out.steeringAngleDeg
     clipped_angle = clip(normalized_angle, -5, 5)
     
