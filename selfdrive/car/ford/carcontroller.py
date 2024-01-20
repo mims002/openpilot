@@ -37,14 +37,14 @@ def apply_ford_curvature_limits(
     )
 
 
-def apply_ford_angle(desired_angle, last_angle, CS):
-    apply_angle = apply_std_steer_angle_limits(
-        desired_angle, last_angle, CS.out.vEgoRaw, CarControllerParamsBronco
+def apply_ford_angle(desired_angle, CS):
+    desired_angle = apply_std_steer_angle_limits(
+        desired_angle, CS.out.steeringAngleDeg, CS.out.vEgoRaw, CarControllerParamsBronco
     )
-    apply_angle = clip(
-        apply_angle, CS.out.steeringAngleDeg - 30, CS.out.steeringAngleDeg + 30
-    )
-    return apply_angle
+    normalized_angle = desired_angle - CS.out.steeringAngleDeg
+    clipped_angle = clip(normalized_angle, -5, 5)
+    
+    return clipped_angle
 
 
 class CarController:
@@ -130,17 +130,17 @@ class CarController:
                 CS.out.vEgoRaw,
             )
             apply_angle = apply_ford_angle(
-                actuators.steeringAngleDeg, self.apply_angle_last, CS
+                actuators.steeringAngleDeg, CS
             )
 
             self.apply_curvature_last = apply_curvature
         else:
             apply_curvature = 0.0
-            apply_angle = CS.out.steeringAngleDeg
+            apply_angle = 0
 
         # send steer msg at 20Hz
         if (self.frame % CarControllerParams.STEER_STEP) == 0:
-            if True or self.CP.carFingerprint in CANFD_CAR:
+            if self.CP.carFingerprint in CANFD_CAR:
                 # TODO: extended mode
                 mode = 1 if CC.latActive else 0
                 counter = (self.frame // CarControllerParams.STEER_STEP) % 0xF
@@ -169,7 +169,7 @@ class CarController:
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             if CC.latActive and CS.lkas_available:
-                new_direction = 4 if apply_angle > 0 else 2
+                new_direction = 2 if CS.out.steeringAngleDeg > 0 else 4
             else:
                 new_direction = 0
 
@@ -276,6 +276,6 @@ class CarController:
         
         new_actuators = actuators.copy()
         new_actuators.curvature = self.apply_curvature_last
-        new_actuators.steeringAngleDeg = self.apply_angle_last
+        new_actuators.steeringAngleDeg = apply_angle + CS.out.steeringAngleDeg
         self.frame += 1
         return new_actuators, can_sends

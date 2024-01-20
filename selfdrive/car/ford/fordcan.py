@@ -45,7 +45,7 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
   Frequency is 33Hz.
   """
 
-  millirad = math.radians(apply_angle) * 100
+  millirad = math.radians(apply_angle) * 1000
   millirad = clip(millirad,-102.4, 102.3)
 
 
