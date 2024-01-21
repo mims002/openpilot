@@ -61,6 +61,7 @@ class CarController:
         self.main_on_last = False
         self.lkas_enabled_last = False
         self.steer_alert_last = False
+        self.direction = 0
 
     def update(self, CC, CS, now_nanos):
         can_sends = []
@@ -166,7 +167,7 @@ class CarController:
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             if CC.latActive and CS.lkas_available:
-                new_direction = 2 if CS.out.steeringAngleDeg > 0 else 4
+                new_direction = 2 if self.direction == 2 else 4
             else:
                 new_direction = 0
             
@@ -175,6 +176,7 @@ class CarController:
             else:
                 ramp_type = 0
 
+            self.direction = new_direction
             message = fordcan.create_lka_msg(
                 self.packer,
                 self.CAN,
