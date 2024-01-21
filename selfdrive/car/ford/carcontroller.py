@@ -1,5 +1,6 @@
 from cereal import car
 from openpilot.common.numpy_fast import clip
+import time
 from openpilot.common.conversions import Conversions as CV
 from opendbc.can.packer import CANPacker
 from openpilot.selfdrive.car import apply_std_steer_angle_limits, AngleRateLimit
@@ -61,6 +62,8 @@ class CarController:
         self.main_on_last = False
         self.lkas_enabled_last = False
         self.steer_alert_last = False
+        self.last_timeout_at = time.time()
+        self.last_timeout_duration = 10000
 
     def update(self, CC, CS, now_nanos):
         can_sends = []
@@ -165,7 +168,11 @@ class CarController:
 
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
-            if CC.latActive and CS.lkas_available:
+            if not CS.lkas_available:
+                self.last_timeout_duration = time.time() - self.last_timeout_at
+                self.last_timeout_at = time.time()
+                
+            if CC.latActive and CS.lkas_available and time.time() - self.last_timeout_at < self.last_timeout_duration - 100:
                 new_direction = 2 if CS.out.steeringAngleDeg > 0 else 4
             else:
                 new_direction = 0
