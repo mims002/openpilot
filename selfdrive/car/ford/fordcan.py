@@ -54,9 +54,9 @@ def create_lka_msg(packer, CAN: CanBus, lat_active: bool, apply_angle: float, cu
     'LkaActvStats_D2_Req': direction,
     'LaRefAng_No_Req': millirad,
     'LaRampType_B_Req': ramp_type,
-    'LaCurvature_No_Calc': curvature,
+    'LaCurvature_No_Calc': 0,
     'LdwActvStats_D_Req': 0,
-    'LdwActvIntns_D_Req': 2,
+    'LdwActvIntns_D_Req': 0,
   }
 
   return packer.make_can_msg("Lane_Assist_Data1", CAN.main, values)
@@ -90,7 +90,7 @@ def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, lateral_motion_con
   values = {
     "LatCtlRng_L_Max": lateral_motion_control["LatCtlRng_L_Max"],                       # Unknown [0|126] meter
     "HandsOffCnfm_B_Rq": lateral_motion_control["HandsOffCnfm_B_Rq"],                     # Unknown: 0=Inactive, 1=Active [0|1]
-    "LatCtl_D_Rq": 1,                                                             # Mode: 0=None, 1=ContinuousPathFollowing, 2=InterventionLeft,
+    "LatCtl_D_Rq": 0,                                                             # Mode: 0=None, 1=ContinuousPathFollowing, 2=InterventionLeft,
                                                                                     #       3=InterventionRight, 4-7=NotUsed [0|7]
     "LatCtlRampType_D_Rq": lateral_motion_control["LatCtlRampType_D_Rq"],                   # Ramp speed: 0=Slow, 1=Medium, 2=Fast, 3=Immediate [0|3]
                                                 #             Makes no difference with curvature control
@@ -101,7 +101,7 @@ def create_lat_ctl_msg(packer, CAN: CanBus, lat_active: bool, lateral_motion_con
     "LatCtlCurv_NoRate_Actl": lateral_motion_control["LatCtlCurv_NoRate_Actl"],     # Curvature rate [-0.001024|0.00102375] 1/meter^2
     "LatCtlCurv_No_Actl": lateral_motion_control["LatCtlCurv_No_Actl"],             # Curvature [-0.02|0.02094] 1/meter
   }
-  return packer.make_can_msg("LateralMotionControl", CAN.main, values)
+  return packer.make_can_msg("LateralMotionControl", CAN.main, {})
 
 
 def create_lat_ctl2_msg(packer, CAN: CanBus, mode: int, path_offset: float, path_angle: float, curvature: float,
@@ -133,7 +133,7 @@ def create_lat_ctl2_msg(packer, CAN: CanBus, mode: int, path_offset: float, path
   dat = packer.make_can_msg("LateralMotionControl2", 0, values)[2]
   values["LatCtlPath_No_Cs"] = calculate_lat_ctl2_checksum(mode, counter, dat)
 
-  return packer.make_can_msg("LateralMotionControl2", CAN.main, values)
+  return packer.make_can_msg("LateralMotionControl2", CAN.main, {})
 
 
 def create_acc_msg(packer, CAN: CanBus, long_active: bool, gas: float, accel: float, stopping: bool, v_ego_kph: float):
