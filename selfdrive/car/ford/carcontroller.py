@@ -174,8 +174,11 @@ class CarController:
                 
             if time.time() - self.last_timeout_at > self.last_timeout_duration and CS.lkas_available:
                 self.last_timeout_duration = time.time() - self.last_timeout_at
-                
-            near_timeout = time.time() - self.last_timeout_at >= self.last_timeout_duration - 100
+                near_timeout = False
+            elif time.time() - self.last_timeout_at >= self.last_timeout_duration - 100:
+                near_timeout = True
+            else:
+                near_timeout = False
             
             if CC.latActive and CS.lkas_available and not near_timeout:
                 new_direction = 2 if CS.out.steeringAngleDeg > 0 else 4
