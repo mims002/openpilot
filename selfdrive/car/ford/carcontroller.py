@@ -167,7 +167,7 @@ class CarController:
         # send lka msg at 33Hz
         if (self.frame % CarControllerParams.LKA_STEP) == 0:
             if CC.latActive and CS.lkas_available:
-                new_direction = 2 if self.direction == 2 else 4
+                new_direction = 2 if self.direction == 4 else 4
             else:
                 new_direction = 0
             
