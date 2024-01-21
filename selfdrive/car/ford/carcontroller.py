@@ -63,8 +63,9 @@ class CarController:
         self.lkas_enabled_last = False
         self.steer_alert_last = False
         self.last_timeout_at = time.time()
-        self.last_timeout_duration = 100000000
-        self.last_on = False
+        self.last_timeout_duration = 0
+        self.on_count = 0
+        
 
     def update(self, CC, CS, now_nanos):
         can_sends = []
@@ -181,12 +182,12 @@ class CarController:
             else:
                 near_timeout = False
             
-            if CC.latActive and CS.lkas_available and not self.last_on:
+            if CC.latActive and CS.lkas_available and self.on_count < 10:
                 new_direction = 2 if CS.out.steeringAngleDeg > 0 else 4
-                self.last_on = True
+                self.on_count += 1
             else:
                 new_direction = 0
-                self.last_on= False
+                self.on_count = 0
             
             if  abs(apply_angle) >= 5 :
                 ramp_type = 1
