@@ -182,7 +182,7 @@ class CarController:
             else:
                 near_timeout = False
             
-            if CC.latActive and CS.lkas_available and self.on_count < 200:
+            if CC.latActive and CS.lkas_available and self.on_count < 150:
                 new_direction = 2 if CS.out.steeringAngleDeg > 0 else 4
                 self.on_count += 1
             else:
