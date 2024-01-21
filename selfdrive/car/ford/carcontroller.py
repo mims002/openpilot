@@ -172,7 +172,7 @@ class CarController:
                 self.last_timeout_duration = time.time() - self.last_timeout_at
                 self.last_timeout_at = time.time()
                 
-            if time.time() - self.last_timeout_at >= self.last_timeout_duration:
+            if time.time() - self.last_timeout_at > self.last_timeout_duration and CS.lkas_available:
                 self.last_timeout_duration = time.time() - self.last_timeout_at
                 
             near_timeout = time.time() - self.last_timeout_at >= self.last_timeout_duration - 100
