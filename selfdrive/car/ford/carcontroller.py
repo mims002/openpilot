@@ -142,7 +142,7 @@ class CarController:
 
         # send steer msg at 20Hz
         if (self.frame % CarControllerParams.STEER_STEP) == 0:
-            if self.CP.carFingerprint in CANFD_CAR:
+            if True or self.CP.carFingerprint in CANFD_CAR:
                 # TODO: extended mode
                 mode = 1 if CC.latActive else 0
                 counter = (self.frame // CarControllerParams.STEER_STEP) % 0xF
