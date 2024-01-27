@@ -134,7 +134,7 @@ class CarState(CarStateBase):
       ("RCMStatusMessage2_FD1", 10),
     ]
 
-    if True or CP.carFingerprint in CANFD_CAR:
+    if CP.carFingerprint in CANFD_CAR:
       messages += [
         ("Lane_Assist_Data3_FD1", 33),
       ]
