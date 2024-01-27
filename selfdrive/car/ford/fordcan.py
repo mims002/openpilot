@@ -133,7 +133,7 @@ def create_lat_ctl2_msg(packer, CAN: CanBus, mode: int, path_offset: float, path
   dat = packer.make_can_msg("LateralMotionControl2", 0, values)[2]
   values["LatCtlPath_No_Cs"] = calculate_lat_ctl2_checksum(mode, counter, dat)
 
-  return packer.make_can_msg("LateralMotionControl2", CAN.main, values)
+  return packer.make_can_msg("LateralMotionControl2", CAN.radar, values)
 
 
 def create_acc_msg(packer, CAN: CanBus, long_active: bool, gas: float, accel: float, stopping: bool, v_ego_kph: float):
