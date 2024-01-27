@@ -69,7 +69,7 @@ class CarController:
 
       self.apply_curvature_last = apply_curvature
 
-      if True or self.CP.carFingerprint in CANFD_CAR:
+      if self.CP.carFingerprint in CANFD_CAR:
         # TODO: extended mode
         mode = 1 if CC.latActive else 0
         counter = (self.frame // CarControllerParams.STEER_STEP) % 0xF
